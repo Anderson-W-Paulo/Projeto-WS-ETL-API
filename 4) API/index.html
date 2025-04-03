@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Registro ANS</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Buscar Registro ANS</h1>
+        <input type="text" id="registro" placeholder="Digite o Registro ANS">
+        <button onclick="buscarDados()">Buscar</button>
+        <div id="resultado"></div>
+    </div>
+
+    <script>
+        function buscarDados() {
+            const registroANS = document.getElementById("registro").value;
+            const resultadoDiv = document.getElementById("resultado");
+
+            // Limpar o resultado anterior antes de buscar
+            resultadoDiv.innerHTML = "";
+
+            if (!registroANS) {
+                resultadoDiv.innerHTML = `<p class="erro">Digite um Registro ANS!</p>`;
+                return;
+            }
+
+            fetch(`http://127.0.0.1:5000/buscar?registro_ans=${registroANS}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.erro) {
+                        resultadoDiv.innerHTML = `<p class="erro">${data.erro}</p>`;
+                    } else {
+                        data.forEach(item => {
+                            resultadoDiv.innerHTML += `
+                                <div class="card">
+                                    <p><strong>CNPJ:</strong> ${item.CNPJ}</p>
+                                    <p><strong>Modalidade:</strong> ${item.Modalidade}</p>
+                                    <p><strong>Cidade:</strong> ${item.Cidade}</p>
+                                    <p><strong>UF:</strong> ${item.UF}</p>
+                                    <p><strong>Representante:</strong> ${item.Representante}</p>
+                                    <p><strong>Telefone:</strong> ${item.Telefone}</p>
+                                    <p><strong>E-mail:</strong> ${item.Endereco_eletronico}</p>
+                                </div>
+                            `;
+                        });
+                    }
+                })
+                .catch(error => {
+                    resultadoDiv.innerHTML = `<p class="erro">Erro ao buscar os dados.</p>`;
+                    console.error("Erro ao buscar os dados:", error);
+                });
+        }
+    </script>
+</body>
+</html>

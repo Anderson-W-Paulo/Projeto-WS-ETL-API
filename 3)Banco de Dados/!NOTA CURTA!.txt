@@ -1,0 +1,9 @@
+3) Banco de Dados
+	Entrego em texto as querys solicitadas.
+
+
+	Problema ao importar arquivo csv para BD MySQL. Importando pela própria interface não sobe nem 15% dos dados e por query dava erro, principal erro 1366 : acontece ao tentar inserir dados com caracteres não compatíveis, tentei de todas as formas, transformar dados, mudar encoding com python, nenhuma das minhas tentativas deram certas. 
+
+	Parecido com PostgreSQL, onde tive um pouco mais de sucesso mas o erro na qual travei foi que as chaves estrangeiras dos arquivos de trimestre não existiam no relatório principal dos cadastros das operadoras, tentei um filtro mas não subiu. 
+
+	

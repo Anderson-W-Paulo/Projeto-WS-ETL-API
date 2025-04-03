@@ -1,0 +1,3 @@
+4) API
+
+	Beck-end desenvolvido e executado com VSCode, que rodou normalmente a biblioteca flask_cors para poder gerar atualização automática após as requisições no browser. Não consegui um bom desenvolvimento com vue nesse período do projeto, mas não sendo por isso, fiz com html + css. 

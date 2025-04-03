@@ -1,0 +1,134 @@
+CREATE DATABASE relatorio;
+USE relatorio;
+
+CREATE TABLE operadoras (
+    Registro_ANS BIGINT PRIMARY KEY,  -- Identificador único
+    CNPJ VARCHAR(20),
+    Razao_Social VARCHAR(255),
+    Nome_Fantasia VARCHAR(255),
+    Modalidade VARCHAR(100),
+    Logradouro VARCHAR(255),
+    Numero VARCHAR(20),
+    Complemento VARCHAR(100),
+    Bairro VARCHAR(100),
+    Cidade VARCHAR(100),
+    UF CHAR(2),  
+    CEP VARCHAR(10),
+    DDD VARCHAR(3),
+    Telefone VARCHAR(20),
+    Fax VARCHAR(20),
+    Endereco_eletronico VARCHAR(255),
+    Representante VARCHAR(255),
+    Cargo_Representante VARCHAR(100),
+    Regiao_de_Comercializacao VARCHAR(255),
+    Data_Registro_ANS DATE  
+);
+
+
+
+
+COPY operadoras FROM 'C:/Users/ander/Desktop/Scripts - python/IntuitiveCare/3)Banco de Dados/Relatorio_cadop_modificado.csv'
+DELIMITER ';'
+CSV HEADER
+ENCODING 'LATIN1';
+
+===============================================================================================================================
+
+
+CREATE TABLE t1_2023 (
+    data DATE NOT NULL,
+    reg_ans INT NOT NULL,
+    cd_conta_contabil VARCHAR(50),
+    descricao TEXT,
+    vl_saldo_inicial NUMERIC(15,2),
+    vl_saldo_final NUMERIC(15,2),
+	    FOREIGN KEY (reg_ans) REFERENCES operadoras (registro_ans) ON DELETE CASCADE
+);
+
+
+
+COPY t1_2023 FROM 'C:/Users/ander/Desktop/Scripts - python/IntuitiveCare/3)Banco de Dados/2023/1T2023_filtrado3.csv'
+DELIMITER ';'
+CSV HEADER
+ENCODING 'LATIN1';
+
+
+===============================================================================================================================
+
+ASSIM POR DIANTE PARA CRIAÇÃO DAS OUTRAS TABELAS
+
+===============================================================================================================================
+
+QUERY
+3.5.1 - Quais as 10 operadoras com maiores despesas em "EVENTOS/ SINISTROS CONHECIDOS OU 
+AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR" no último trimestre?
+
+
+WITH despesas_aggregadas AS (
+    SELECT 
+        t.REG_ANS, 
+        SUM(t.VL_SALDO_INICIAL - t.VL_SALDO_FINAL) AS total_despesas
+    FROM relatorio.4trimestre_2024 t
+    WHERE t.DESCRICAO = 'EVENTOS/ SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR'
+    GROUP BY t.REG_ANS
+)
+SELECT 
+    o.Razao_Social, 
+    d.REG_ANS, 
+    d.total_despesas
+FROM despesas_aggregadas d
+JOIN relatorio.operadoras o ON d.REG_ANS = o.Registro_ANS
+ORDER BY d.total_despesas DESC
+LIMIT 10;
+
+
+
+QUERY
+3.5.2 - Quais as 10 operadoras com maiores despesas nessa categoria no último ano?
+
+
+WITH despesas_aggregadas AS (
+    SELECT 
+        REG_ANS, 
+        SUM(VL_SALDO_INICIAL + VL_SALDO_FINAL) AS total_despesas
+    FROM (
+        SELECT REG_ANS, VL_SALDO_INICIAL, VL_SALDO_FINAL FROM relatorio.1trimestre_2024 WHERE DESCRICAO = 'EVENTOS/ SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR'
+        UNION ALL
+        SELECT REG_ANS, VL_SALDO_INICIAL, VL_SALDO_FINAL FROM relatorio.2trimestre_2024 WHERE DESCRICAO = 'EVENTOS/ SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR'
+        UNION ALL
+        SELECT REG_ANS, VL_SALDO_INICIAL, VL_SALDO_FINAL FROM relatorio.3trimestre_2024 WHERE DESCRICAO = 'EVENTOS/ SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR'
+        UNION ALL
+        SELECT REG_ANS, VL_SALDO_INICIAL, VL_SALDO_FINAL FROM relatorio.4trimestre_2024 WHERE DESCRICAO = 'EVENTOS/ SINISTROS CONHECIDOS OU AVISADOS DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR'
+    ) AS todos_trimestres
+    GROUP BY REG_ANS
+)
+SELECT 
+    o.Razao_Social, 
+    d.REG_ANS, 
+    d.total_despesas
+FROM despesas_aggregadas d
+JOIN relatorio.operadoras o ON d.REG_ANS = o.Registro_ANS
+ORDER BY d.total_despesas DESC
+LIMIT 10;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
